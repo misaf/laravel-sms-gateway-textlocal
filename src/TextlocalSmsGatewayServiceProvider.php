@@ -20,11 +20,11 @@ final class TextlocalSmsGatewayServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->app->afterResolving(SmsGatewayManager::class, function (SmsGatewayManager $manager, Application $app): void {
-            $manager->extend('textlocal', fn (): TextlocalDriver => $app->make(TextlocalDriver::class));
+            $manager->extend('textlocal', fn(): TextlocalDriver => $app->make(TextlocalDriver::class));
         });
 
         if ($this->app->bound('sms-gateway')) {
-            $this->app->make('sms-gateway')->extend('textlocal', fn (): TextlocalDriver => $this->app->make(TextlocalDriver::class));
+            $this->app->make('sms-gateway')->extend('textlocal', fn(): TextlocalDriver => $this->app->make(TextlocalDriver::class));
         }
     }
 }
