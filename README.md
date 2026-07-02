@@ -1,29 +1,46 @@
 # Laravel SMS Gateway Textlocal Driver
 
-Textlocal driver package for [`misaf/laravel-sms-gateway`](https://github.com/misaf/laravel-sms-gateway).
+Textlocal SMS gateway driver for [`misaf/laravel-sms-gateway`](https://github.com/misaf/laravel-sms-gateway).
 
 ## Installation
 
 ```bash
-composer require misaf/laravel-sms-gateway misaf/laravel-sms-gateway-textlocal
+composer require misaf/laravel-sms-gateway-textlocal
 ```
 
-Laravel package discovery registers `Misaf\LaravelSmsGatewayTextlocal\TextlocalSmsGatewayServiceProvider` automatically.
+Laravel package discovery registers the driver service provider automatically.
 
-## Usage
-
-Set the default driver when this provider should be used by default:
+## Configuration
 
 ```env
 SMS_GATEWAY_DRIVER=textlocal
+SMS_GATEWAY_TEXTLOCAL_APIKEY=your-api-key
 ```
 
-Then configure the provider credentials in `config/services.php` and use the shared facade:
+```php
+// config/services.php
+'textlocal' => [
+    'api_key' => env('SMS_GATEWAY_TEXTLOCAL_APIKEY'),
+],
+```
+
+## Usage
 
 ```php
 use Misaf\LaravelSmsGateway\Facade\SmsGateway;
 
-SmsGateway::driver('textlocal')->request();
+$response = SmsGateway::driver('textlocal')->send([
+    'numbers' => '09123456789',
+    'message' => 'Hello',
+]);
+```
+
+The payload is passed directly to Textlocal, so use the fields expected by the Textlocal API.
+
+Use `request()` when you need direct access to Laravel's HTTP client:
+
+```php
+$request = SmsGateway::driver('textlocal')->request();
 ```
 
 ## Testing
