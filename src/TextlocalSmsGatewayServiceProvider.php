@@ -24,7 +24,7 @@ final class TextlocalSmsGatewayServiceProvider extends PackageServiceProvider
         });
 
         if ($this->app->bound('sms-gateway')) {
-            $this->app->make('sms-gateway')->extend('textlocal', fn(): TextlocalDriver => $this->app->make(TextlocalDriver::class));
+            $this->app->make('sms-gateway')->extend('textlocal', fn(Application $app): TextlocalDriver => $app->make(TextlocalDriver::class));
         }
     }
 }
