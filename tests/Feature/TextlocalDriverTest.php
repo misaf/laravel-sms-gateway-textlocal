@@ -14,21 +14,19 @@ test('can send SMS via Textlocal driver', function (): void {
     $response = ['status' => 'success'];
 
     Http::fake([
-        'https://api.txtlocal.com/send*' => Http::response($response, 200),
+        'https://api.txtlocal.com/*' => Http::response($response, 200),
     ]);
 
-    $result = SmsGateway::driver()->request()
-        ->post('send', [
-            'numbers' => '447123456789',
-            'sender'  => 'Laravel',
-            'message' => 'Hello from Textlocal',
-        ])
-        ->json();
+    $result = SmsGateway::driver()->send([
+        'numbers' => '447123456789',
+        'sender'  => 'Laravel',
+        'message' => 'Hello from Textlocal',
+    ])->json();
 
     Http::assertSent(function (Request $request): bool {
         $query = Uri::of($request->url())->query()->all();
 
-        return 'https://api.txtlocal.com/send?apikey=textlocal-api-key' === $request->url()
+        return 'https://api.txtlocal.com/send/?apikey=textlocal-api-key' === $request->url()
             && 'textlocal-api-key' === $query['apikey']
             && $request->isForm()
             && '447123456789' === $request['numbers']
@@ -37,4 +35,21 @@ test('can send SMS via Textlocal driver', function (): void {
     });
 
     expect($result)->toEqual($response);
+});
+
+test('prefers the base URL configured in services over the driver default', function (): void {
+    config()->set('sms_gateway.default', 'textlocal');
+    config()->set('services.textlocal.base_url', 'https://services-override.example.test/');
+
+    Http::fake([
+        'https://services-override.example.test/*' => Http::response(['status' => 'success'], 200),
+    ]);
+
+    SmsGateway::driver()->send([
+        'message' => 'Hello',
+    ]);
+
+    Http::assertSent(function (Request $request): bool {
+        return 'https://services-override.example.test/send/' === strtok($request->url(), '?');
+    });
 });
