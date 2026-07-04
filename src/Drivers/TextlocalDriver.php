@@ -5,16 +5,20 @@ declare(strict_types=1);
 namespace Misaf\LaravelSmsGatewayTextlocal\Drivers;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use Misaf\LaravelSmsGateway\SmsGatewayDriver;
 
 final class TextlocalDriver extends SmsGatewayDriver
 {
-    protected function driverName(): string
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function send(array $data): Response
     {
-        return 'textlocal';
+        return $this->request()->post('send/', $data);
     }
 
-    protected function defaultGateway(): string
+    protected function defaultBaseUrl(): string
     {
         return 'https://api.txtlocal.com/';
     }
@@ -24,7 +28,7 @@ final class TextlocalDriver extends SmsGatewayDriver
         return $request
             ->asForm()
             ->withQueryParameters([
-                'apikey' => $this->serviceConfigString('api_key'),
+                'apikey' => $this->driverConfig('api_key'),
             ]);
     }
 }

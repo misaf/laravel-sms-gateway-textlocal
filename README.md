@@ -21,8 +21,19 @@ SMS_GATEWAY_TEXTLOCAL_APIKEY=your-api-key
 // config/services.php
 'textlocal' => [
     'api_key' => env('SMS_GATEWAY_TEXTLOCAL_APIKEY'),
+    'base_url' => env('SMS_GATEWAY_TEXTLOCAL_BASE_URL', 'https://api.txtlocal.com/'),
 ],
 ```
+
+## Driver Behavior
+
+| Option | Value |
+| --- | --- |
+| Driver name | `textlocal` |
+| Default base URL | `https://api.txtlocal.com/` |
+| `send()` endpoint | `POST send/` |
+| Authentication | `apikey` query parameter from `services.textlocal.api_key` |
+| Payload | Form data sent directly to Textlocal |
 
 ## Usage
 
@@ -30,8 +41,9 @@ SMS_GATEWAY_TEXTLOCAL_APIKEY=your-api-key
 use Misaf\LaravelSmsGateway\Facade\SmsGateway;
 
 $response = SmsGateway::driver('textlocal')->send([
-    'numbers' => '09123456789',
-    'message' => 'Hello',
+    'numbers' => '447123456789',
+    'sender'  => 'Laravel',
+    'message' => 'Hello from Textlocal',
 ]);
 ```
 
